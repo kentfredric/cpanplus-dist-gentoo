@@ -2,13 +2,14 @@ NAME
     CPANPLUS::Dist::Gentoo - CPANPLUS backend generating Gentoo ebuilds.
 
 VERSION
-    Version 0.01
+    Version 0.02_01
 
 SYNOPSIS
         cpan2dist --format=CPANPLUS::Dist::Gentoo \
                   --dist-opts overlay=/usr/local/portage \
                   --dist-opts distdir=/usr/portage/distfiles \
                   --dist-opts manifest=yes \
+                  --dist-opts keywords=x86 \
                   Any::Module You::Like
 
 DESCRPITON
@@ -19,8 +20,8 @@ DESCRPITON
     permissions on the directory where Gentoo fetches its source files
     (usually "/usr/portage/distfiles").
 
-    The generated ebuilds are placed into the section "perl-cpanp". They
-    favour depending on "perl-core" or "dev-perl" rather than "perl-cpanp".
+    The generated ebuilds are placed into the section "perl-gcpanp". They
+    favour depending on "perl-core" or "dev-perl" rather than "perl-gcpanp".
 
 METHODS
     All the methods are inherited from CPANPLUS::Dist::Base. Please refer to

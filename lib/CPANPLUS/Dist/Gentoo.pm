@@ -19,11 +19,11 @@ CPANPLUS::Dist::Gentoo - CPANPLUS backend generating Gentoo ebuilds.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02_01
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02_01';
 
 =head1 SYNOPSIS
 
@@ -31,19 +31,22 @@ our $VERSION = '0.01';
               --dist-opts overlay=/usr/local/portage \
               --dist-opts distdir=/usr/portage/distfiles \
               --dist-opts manifest=yes \
+              --dist-opts keywords=x86 \
               Any::Module You::Like
 
 =head1 DESCRPITON
 
 This module is a CPANPLUS backend that recursively generates Gentoo ebuilds for a given package in the specified overlay (defaults to C</usr/local/portage>), update the manifest, and even emerge it (together with its dependencies) if the user requires it. You need write permissions on the directory where Gentoo fetches its source files (usually C</usr/portage/distfiles>).
 
-The generated ebuilds are placed into the section C<perl-cpanp>. They favour depending on C<perl-core> or C<dev-perl> rather than C<perl-cpanp>.
+The generated ebuilds are placed into the section C<perl-gcpanp>. They favour depending on C<perl-core> or C<dev-perl> rather than C<perl-gcpanp>.
 
 =head1 METHODS
 
 All the methods are inherited from L<CPANPLUS::Dist::Base>. Please refer to its perldoc for precise information on what's done at each step.
 
 =cut
+
+use constant CATEGORY => 'perl-gcpanp';
 
 sub format_available {
  for my $prog (qw/emerge ebuild/) {
@@ -55,14 +58,12 @@ sub format_available {
  return 1;
 }
 
-my $overlay;
-
 sub init {
  my ($self) = @_;
  my $stat = $self->status;
  $stat->mk_accessors(qw/name version dist desc uri src license deps
                         eb_name eb_version eb_dir eb_file distdir fetched_arch
-                        do_manifest/);
+                        keywords do_manifest/);
 
  return 1;
 }
@@ -84,11 +85,19 @@ sub prepare {
 
  my %opts = @_;
 
- my $manifest = delete($opts{'manifest'});
- $manifest = 0 if not defined $manifest or $manifest =~ /^\s*no?\s*$/i;
+ my $keywords = delete $opts{'keywords'};
+ $keywords = 'x86' unless defined $keywords;
+ $keywords = [ split ' ', $keywords ];
+ $stat->keywords($keywords);
+
+ my $manifest = delete $opts{'manifest'};
+ $manifest = 1 unless defined $manifest;
+ $manifest = 0 if $manifest =~ /^\s*no?\s*$/i;
  $stat->do_manifest($manifest);
+
  my $overlay = catdir(delete($opts{'overlay'}) || '/usr/local/portage',
-                      'perl-cpanp');
+                      CATEGORY);
+
  $stat->distdir(delete($opts{'distdir'}) || '/usr/portage/distfiles');
  if ($stat->do_manifest && !-w $stat->distdir) {
   error 'distdir isn\'t writable -- aborting';
@@ -174,7 +183,6 @@ sub create {
  $self->SUPER::create(@_);
 
  my $dir = $stat->eb_dir;
- print STDERR "@@@ mkdir $dir\n";
  unless (-d $dir) {
   eval { mkpath $dir };
   if ($@) {
@@ -190,6 +198,7 @@ sub create {
  $d   .= 'SRC_URI="' . $stat->src . "\"\n";
  $d   .= "SLOT=\"0\"\n";
  $d   .= 'LICENSE="|| ( ' . join(' ', sort @{$stat->license}) . " )\"\n";
+ $d   .= 'KEYWORDS="' . join(' ', sort @{$stat->keywords}) . "\"\n";
  $d   .= 'DEPEND="' . join "\n",
   'dev-lang/perl',
   map {
@@ -200,7 +209,7 @@ sub create {
     $a .= '-' . $_->[1];
    }
    '|| ( ' . join(' ', map "$x$_/$a",
-                           qw/perl-core dev-perl perl-cpanp/) # perl-gcpan ?
+                           qw/perl-core dev-perl/, CATEGORY) # perl-gcpan ?
            . ' )';
   } @{$stat->deps};
  $d   .= "\"\n";
@@ -237,7 +246,7 @@ sub install {
  my $conf = $self->parent->parent->configure_object;
 
  my $sudo = $conf->get_program('sudo');
- my @cmd = 'emerge', '=' . $stat->eb_name . '-' . $stat->eb_version;
+ my @cmd = ('emerge', '=' . $stat->eb_name . '-' . $stat->eb_version);
  unshift @cmd, $sudo if $sudo;
 
  unless (run command => \@cmd, verbose => 1) {
@@ -254,7 +263,7 @@ sub uninstall {
  my $conf = $self->parent->parent->configure_object;
 
  my $sudo = $conf->get_program('sudo');
- my @cmd = 'emerge', '=' . $stat->eb_name . '-' . $stat->eb_version;
+ my @cmd = ('emerge', '-C', '=' . $stat->eb_name . '-' . $stat->eb_version);
  unshift @cmd, $sudo if $sudo;
 
  unless (run command => \@cmd, verbose => 1) {

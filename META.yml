@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:                CPANPLUS-Dist-Gentoo
-version:             0.01
+version:             0.02_01
 abstract:            CPANPLUS backend generating Gentoo ebuilds.
 license:             perl
 author:              
