@@ -1,0 +1,66 @@
+NAME
+    CPANPLUS::Dist::Gentoo - CPANPLUS backend generating Gentoo ebuilds.
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        cpan2dist --format=CPANPLUS::Dist::Gentoo \
+                  --dist-opts overlay=/usr/local/portage \
+                  --dist-opts distdir=/usr/portage/distfiles \
+                  --dist-opts manifest=yes \
+                  Any::Module You::Like
+
+DESCRPITON
+    This module is a CPANPLUS backend that recursively generates Gentoo
+    ebuilds for a given package in the specified overlay (defaults to
+    "/usr/local/portage"), update the manifest, and even emerge it (together
+    with its dependencies) if the user requires it. You need write
+    permissions on the directory where Gentoo fetches its source files
+    (usually "/usr/portage/distfiles").
+
+    The generated ebuilds are placed into the section "perl-cpanp". They
+    favour depending on "perl-core" or "dev-perl" rather than "perl-cpanp".
+
+METHODS
+    All the methods are inherited from CPANPLUS::Dist::Base. Please refer to
+    its perldoc for precise information on what's done at each step.
+
+DEPENDENCIES
+    Gentoo (<http://gentoo.org>).
+
+    CPANPLUS, IPC::Cmd (core modules since 5.9.5).
+
+    File::Path (since 5.001), File::Copy (5.002), File::Spec::Functions
+    (5.00504).
+
+SEE ALSO
+    cpan2dist.
+
+    CPANPLUS::Dist::Base, CPANPLUS::Dist::Deb, CPANPLUS::Dist::Mdv.
+
+AUTHOR
+    Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+BUGS
+    Please report any bugs or feature requests to "bug-cpanplus-dist-gentoo
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=CPANPLUS-Dist-Gentoo>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc CPANPLUS::Dist::Gentoo
+
+ACKNOWLEDGEMENTS
+    The module is to some extend cargo-culted from CPANPLUS::Dist::Deb and
+    CPANPLUS::Dist::Mdv.
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Vincent Pit, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

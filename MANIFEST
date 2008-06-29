@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/CPANPLUS/Dist/Gentoo.pm
+t/00-load.t
+t/90-boilerplate.t
+t/91-pod.t
+t/92-pod-coverage.t
+t/95-portability-files.t
+t/99-kwalitee.t
+META.yml                                 Module meta-data (added by MakeMaker)

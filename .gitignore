@@ -1,0 +1,16 @@
+blib*
+pm_to_blib*
+
+Makefile{,.old}
+Build
+_build*
+
+*.tar.gz
+CPANPLUS-Dist-Gentoo-*
+
+core.*
+*.{c,o,so,bs,out,def,exp}
+
+cover_db
+*.{gcda,gcov,gcno}
+
