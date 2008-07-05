@@ -1,7 +1,8 @@
 blib*
 pm_to_blib*
 
-Makefile{,.old}
+Makefile
+Makefile.old
 Build
 _build*
 
@@ -9,8 +10,14 @@ _build*
 CPANPLUS-Dist-Gentoo-*
 
 core.*
-*.{c,o,so,bs,out,def,exp}
+*.[co]
+*.so
+*.bs
+*.out
+*.def
+*.exp
 
 cover_db
-*.{gcda,gcov,gcno}
-
+*.gcda
+*.gcov
+*.gcno
