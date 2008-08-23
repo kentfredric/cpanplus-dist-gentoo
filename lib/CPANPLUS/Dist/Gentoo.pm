@@ -209,7 +209,7 @@ sub create {
     $a .= '-' . $_->[1];
    }
    '|| ( ' . join(' ', map "$x$_/$a",
-                           qw/perl-core dev-perl/, CATEGORY) # perl-gcpan ?
+                           qw/perl-core dev-perl perl-gcpan/, CATEGORY)
            . ' )';
   } @{$stat->deps};
  $d   .= "\"\n";
