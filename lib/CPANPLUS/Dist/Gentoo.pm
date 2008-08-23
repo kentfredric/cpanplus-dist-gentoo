@@ -40,6 +40,10 @@ This module is a CPANPLUS backend that recursively generates Gentoo ebuilds for 
 
 The generated ebuilds are placed into the section C<perl-gcpanp>. They favour depending on C<perl-core> or C<dev-perl> rather than C<perl-gcpanp>.
 
+=head1 INSTALLATION
+
+After installing this module, you should append C<perl-gcpanp> to your F</etc/portage/categories> file.
+
 =head1 METHODS
 
 All the methods are inherited from L<CPANPLUS::Dist::Base>. Please refer to its perldoc for precise information on what's done at each step.
