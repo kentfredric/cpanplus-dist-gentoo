@@ -73,11 +73,13 @@ sub init {
 }
 
 my %gentooism = (
- 'Digest'          => 'digest-base',
- 'Locale-Maketext' => 'locale-maketext',
- 'Net-Ping'        => 'net-ping',
- 'PathTools'       => 'File-Spec',
- 'PodParser'       => 'Pod-Parser',
+ 'Digest'            => 'digest-base',
+ 'Locale-Maketext'   => 'locale-maketext',
+ 'Net-Ping'          => 'net-ping',
+ 'PathTools'         => 'File-Spec',
+ 'PodParser'         => 'Pod-Parser',
+ 'Set-Scalar'        => 'set-scalar',
+ 'Tie-EncryptedHash' => 'tie-encryptedhash',
 );
 
 sub prepare {
