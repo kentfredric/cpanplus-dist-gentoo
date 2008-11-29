@@ -125,9 +125,15 @@ sub prepare {
 
  $stat->dist($name . '-' . $version);
 
- my $f = 1;
- $version =~ s/_+/$f ? do { $f = 0; '_p' } : ''/ge;
- 1 while $version =~ s/(_p[^.]*)\.+/$1/;
+ $version =~ s/[^\d._]+//g;
+ $version =~ s/^[._]*//;
+ $version =~ s/[._]*$//;
+ $version =~ s/[._]*_[._]*/_/g;
+ {
+  ($version, my $patch, my @rest) = split /_/, $version;
+  $version .= '_p' . $patch if defined $patch;
+  $version .= join('.', '', @rest) if @rest;
+ }
  $stat->eb_version($version);
 
  $stat->eb_name($gentooism{$name} || $name);
