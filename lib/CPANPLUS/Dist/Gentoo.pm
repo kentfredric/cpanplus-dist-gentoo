@@ -149,6 +149,7 @@ sub prepare {
  my $prereqs = $mod->status->prereqs;
  my @depends;
  for my $prereq (sort keys %$prereqs) {
+  next if $prereq =~ /^perl(?:-|\z)/;
   my $obj = $int->module_tree($prereq);
   unless ($obj) {
    error 'Wrong module object -- aborting';
