@@ -1,5 +1,12 @@
 Revision history for CPANPLUS-Dist-Gentoo
 
+0.03    2008-11-29 18:45 UTC
+        + Add : --force regenerates ebuilds.
+        + Fix : Flaky perl -> portage version conversion.
+        + Fix : Prerequisites weren't relinked through gentooisms.
+        + Fix : Generating Manifests with user-defined distdir and overlay.
+        + Upd : META.yml spec updated to 1.4.
+
 0.02_01 2008-05-26 22:35 UTC
         + Add : The 'keywords' option.
         + Chg : From now, the portage category is perl-gcpanp, for consistency

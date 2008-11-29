@@ -2,7 +2,7 @@ NAME
     CPANPLUS::Dist::Gentoo - CPANPLUS backend generating Gentoo ebuilds.
 
 VERSION
-    Version 0.02_01
+    Version 0.03
 
 SYNOPSIS
         cpan2dist --format=CPANPLUS::Dist::Gentoo \
@@ -15,17 +15,23 @@ SYNOPSIS
 DESCRPITON
     This module is a CPANPLUS backend that recursively generates Gentoo
     ebuilds for a given package in the specified overlay (defaults to
-    "/usr/local/portage"), update the manifest, and even emerge it (together
+    /usr/local/portage), updates the manifest, and even emerges it (together
     with its dependencies) if the user requires it. You need write
     permissions on the directory where Gentoo fetches its source files
-    (usually "/usr/portage/distfiles").
+    (usually /usr/portage/distfiles). You also need to specify the correct
+    keyword for your architecture if it differs from the default "x86".
 
-    The generated ebuilds are placed into the section "perl-gcpanp". They
-    favour depending on "perl-core" or "dev-perl" rather than "perl-gcpanp".
+    The generated ebuilds are placed into the "perl-gcpanp" category. They
+    favour depending on "perl-core", "dev-perl" or "perl-gcpan" (in that
+    order) rather than "perl-gcpanp".
+
+INSTALLATION
+    After installing this module, you should append "perl-gcpanp" to your
+    /etc/portage/categories file.
 
 METHODS
     All the methods are inherited from CPANPLUS::Dist::Base. Please refer to
-    its perldoc for precise information on what's done at each step.
+    its documentation for precise information on what's done at each step.
 
 DEPENDENCIES
     Gentoo (<http://gentoo.org>).
@@ -42,6 +48,8 @@ SEE ALSO
 
 AUTHOR
     Vincent Pit, "<perl at profvince.com>", <http://www.profvince.com>.
+
+    You can contact me by mail or on "irc.perl.org" (vincent).
 
 BUGS
     Please report any bugs or feature requests to "bug-cpanplus-dist-gentoo
