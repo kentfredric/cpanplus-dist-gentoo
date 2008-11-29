@@ -38,5 +38,5 @@ WriteMakefile(
                       . build_req,
         COMPRESS   => 'gzip -9f', SUFFIX => 'gz'
     },
-    clean         => { FILES => 'CPANPLUS-Dist-Gentoo-* *.gcov *.gcda *.gcno cover_db' },
+    clean         => { FILES => 'CPANPLUS-Dist-Gentoo-* *.gcov *.gcda *.gcno cover_db Debian_CPANTS.txt' },
 );
