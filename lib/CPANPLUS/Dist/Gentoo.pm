@@ -68,8 +68,8 @@ sub init {
  my $conf = $self->parent->parent->configure_object;
 
  $stat->mk_accessors(qw/name version dist desc uri src license deps
-                        eb_name eb_version eb_dir eb_file distdir fetched_arch
-                        keywords do_manifest
+                        eb_name eb_version eb_dir eb_file fetched_arch
+                        overlay distdir keywords do_manifest
                         verbose/);
 
  $stat->verbose($conf->get_conf('verbose'));
@@ -108,6 +108,7 @@ sub prepare {
 
  my $overlay = catdir(delete($opts{'overlay'}) || '/usr/local/portage',
                       CATEGORY);
+ $stat->overlay($overlay);
 
  $stat->distdir(delete($opts{'distdir'}) || '/usr/portage/distfiles');
  if ($stat->do_manifest && !-w $stat->distdir) {
