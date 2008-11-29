@@ -36,9 +36,9 @@ our $VERSION = '0.02_01';
 
 =head1 DESCRPITON
 
-This module is a CPANPLUS backend that recursively generates Gentoo ebuilds for a given package in the specified overlay (defaults to C</usr/local/portage>), update the manifest, and even emerge it (together with its dependencies) if the user requires it. You need write permissions on the directory where Gentoo fetches its source files (usually C</usr/portage/distfiles>).
+This module is a CPANPLUS backend that recursively generates Gentoo ebuilds for a given package in the specified overlay (defaults to F</usr/local/portage>), updates the manifest, and even emerges it (together with its dependencies) if the user requires it. You need write permissions on the directory where Gentoo fetches its source files (usually F</usr/portage/distfiles>). You also need to specify the correct keyword for your architecture if it differs from the default C<x86>.
 
-The generated ebuilds are placed into the section C<perl-gcpanp>. They favour depending on C<perl-core> or C<dev-perl> rather than C<perl-gcpanp>.
+The generated ebuilds are placed into the C<perl-gcpanp> category. They favour depending on C<perl-core>, C<dev-perl> or C<perl-gcpan> (in that order) rather than C<perl-gcpanp>.
 
 =head1 INSTALLATION
 
@@ -46,7 +46,7 @@ After installing this module, you should append C<perl-gcpanp> to your F</etc/po
 
 =head1 METHODS
 
-All the methods are inherited from L<CPANPLUS::Dist::Base>. Please refer to its perldoc for precise information on what's done at each step.
+All the methods are inherited from L<CPANPLUS::Dist::Base>. Please refer to its documentation for precise information on what's done at each step.
 
 =cut
 
