@@ -65,9 +65,14 @@ sub format_available {
 sub init {
  my ($self) = @_;
  my $stat = $self->status;
+ my $conf = $self->parent->parent->configure_object;
+
  $stat->mk_accessors(qw/name version dist desc uri src license deps
                         eb_name eb_version eb_dir eb_file distdir fetched_arch
-                        keywords do_manifest/);
+                        keywords do_manifest
+                        verbose/);
+
+ $stat->verbose($conf->get_conf('verbose'));
 
  return 1;
 }
@@ -177,7 +182,6 @@ sub prepare {
 sub create {
  my $self = shift;
  my $stat = $self->status;
- my $conf = $self->parent->parent->configure_object;
 
  unless ($stat->prepared) {
   error 'Can\'t create ' . $stat->dist . ' since it was never prepared -- aborting';
@@ -244,7 +248,7 @@ sub create {
                                      verbose => 0;
   unless ($success) {
    error "$errmsg -- aborting";
-   if (defined $output and $conf->get_conf('verbose')) {
+   if (defined $output and $stat->verbose) {
     my $msg = join '', @$output;
     1 while chomp $msg;
     error $msg;
