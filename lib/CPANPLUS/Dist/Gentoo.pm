@@ -279,8 +279,14 @@ sub uninstall {
 
 sub _run {
  my ($self, $cmd, $verbose) = @_;
+ my $stat = $self->status;
 
- my ($success, $errmsg, $output) = run command => $cmd, verbose => $verbose;
+ my ($success, $errmsg, $output) = do {
+  local $ENV{PORTDIR_OVERLAY}     = $stat->overlay;
+  local $ENV{PORTAGE_RO_DISTDIRS} = $stat->distdir;
+  run command => $cmd, verbose => $verbose;
+ };
+
  unless ($success) {
   error "$errmsg -- aborting";
   if (not $verbose and defined $output and $self->status->verbose) {
