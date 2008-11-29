@@ -243,16 +243,7 @@ sub create {
   }
 
   msg 'Adding Manifest entry for ' . $stat->dist;
-  my ($success, $errmsg, $output) = run
-                                     command => [ 'ebuild', $file, 'manifest' ],
-                                     verbose => 0;
-  unless ($success) {
-   error "$errmsg -- aborting";
-   if (defined $output and $stat->verbose) {
-    my $msg = join '', @$output;
-    1 while chomp $msg;
-    error $msg;
-   }
+  unless ($self->_run([ 'ebuild', $file, 'manifest' ], 0)) {
    1 while unlink $file;
    return 0;
   }
@@ -270,14 +261,7 @@ sub install {
  my @cmd = ('emerge', '=' . $stat->eb_name . '-' . $stat->eb_version);
  unshift @cmd, $sudo if $sudo;
 
- my ($success, $errmsg) = run command => \@cmd,
-                              verbose => 1;
- unless ($success) {
-  error "$errmsg -- aborting";
-  return 0;
- }
-
- return 1;
+ return $self->_run(\@cmd, 1);
 }
 
 sub uninstall {
@@ -289,14 +273,23 @@ sub uninstall {
  my @cmd = ('emerge', '-C', '=' . $stat->eb_name . '-' . $stat->eb_version);
  unshift @cmd, $sudo if $sudo;
 
- my ($success, $errmsg) = run command => \@cmd,
-                              verbose => 1;
+ return $self->_run(\@cmd, 1);
+}
+
+sub _run {
+ my ($self, $cmd, $verbose) = @_;
+
+ my ($success, $errmsg, $output) = run command => $cmd, verbose => $verbose;
  unless ($success) {
   error "$errmsg -- aborting";
-  return 0;
+  if (not $verbose and defined $output and $self->status->verbose) {
+   my $msg = join '', @$output;
+   1 while chomp $msg;
+   error $msg;
+  }
  }
 
- return 1;
+ return $success;
 }
 
 =head1 DEPENDENCIES
