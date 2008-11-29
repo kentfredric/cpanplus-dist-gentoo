@@ -70,8 +70,9 @@ sub init {
  $stat->mk_accessors(qw/name version dist desc uri src license deps
                         eb_name eb_version eb_dir eb_file fetched_arch
                         overlay distdir keywords do_manifest
-                        verbose/);
+                        force verbose/);
 
+ $stat->force($conf->get_conf('force'));
  $stat->verbose($conf->get_conf('verbose'));
 
  return 1;
