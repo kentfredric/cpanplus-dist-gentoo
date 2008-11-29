@@ -112,6 +112,7 @@ sub prepare {
  $stat->overlay($overlay);
 
  $stat->distdir(delete($opts{'distdir'}) || '/usr/portage/distfiles');
+
  if ($stat->do_manifest && !-w $stat->distdir) {
   error 'distdir isn\'t writable -- aborting';
   return 0;
@@ -123,19 +124,20 @@ sub prepare {
 
  my $version = $mod->package_version;
  $stat->version($version);
+
  $stat->dist($name . '-' . $version);
+
  my $f = 1;
  $version =~ s/_+/$f ? do { $f = 0; '_p' } : ''/ge;
  1 while $version =~ s/(_p[^.]*)\.+/$1/;
  $stat->eb_version($version);
 
- $stat->eb_name($gentooism{$stat->name} || $stat->name);
+ $stat->eb_name($gentooism{$name} || $name);
+
  $stat->eb_dir(catdir($overlay, $stat->eb_name));
 
  my $file = catfile($stat->eb_dir,
                     $stat->eb_name . '-' . $stat->eb_version . '.ebuild');
- $stat->eb_file($file);
-
  if (-e $file) {
   my $skip = 1;
   if ($stat->force) {
@@ -154,18 +156,22 @@ sub prepare {
    return 1;
   }
  }
+ $stat->eb_file($file);
 
  $self->SUPER::prepare(%opts);
 
  my $desc = $mod->description;
  ($desc = $name) =~ s/-+/::/g unless $desc;
  $stat->desc($desc);
+
  $stat->uri('http://search.cpan.org/dist/' . $name);
+
  unless ($name =~ /^([^-]+)/) {
   error 'Wrong distribution name -- aborting';
   return 0;
  }
  $stat->src('mirror://cpan/modules/by-module/' . $1 . '/' . $mod->package);
+
  $stat->license([ qw/Artistic GPL-2/ ]);
 
  my $prereqs = $mod->status->prereqs;
