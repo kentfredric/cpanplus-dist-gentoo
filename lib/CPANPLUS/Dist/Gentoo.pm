@@ -107,9 +107,7 @@ sub prepare {
  $manifest = 0 if $manifest =~ /^\s*no?\s*$/i;
  $stat->do_manifest($manifest);
 
- my $overlay = catdir(delete($opts{'overlay'}) || '/usr/local/portage',
-                      CATEGORY);
- $stat->overlay($overlay);
+ $stat->overlay(delete($opts{'overlay'}) || '/usr/local/portage');
 
  $stat->distdir(delete($opts{'distdir'}) || '/usr/portage/distfiles');
 
@@ -134,7 +132,7 @@ sub prepare {
 
  $stat->eb_name($gentooism{$name} || $name);
 
- $stat->eb_dir(catdir($overlay, $stat->eb_name));
+ $stat->eb_dir(catdir($stat->overlay, CATEGORY, $stat->eb_name));
 
  my $file = catfile($stat->eb_dir,
                     $stat->eb_name . '-' . $stat->eb_version . '.ebuild');
