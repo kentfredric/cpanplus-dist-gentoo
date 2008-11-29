@@ -147,6 +147,7 @@ sub prepare {
  $stat->license([ qw/Artistic GPL-2/ ]);
 
  my $prereqs = $mod->status->prereqs;
+ $prereqs = { map { ($gentooism{$_} || $_) => $prereqs->{$_} } keys %$prereqs };
  my @depends;
  for my $prereq (sort keys %$prereqs) {
   next if $prereq =~ /^perl(?:-|\z)/;
