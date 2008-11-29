@@ -176,6 +176,7 @@ sub prepare {
 sub create {
  my $self = shift;
  my $stat = $self->status;
+ my $conf = $self->parent->parent->configure_object;
 
  unless ($stat->prepared) {
   error 'Can\'t create ' . $stat->dist . ' since it was never prepared -- aborting';
@@ -237,10 +238,16 @@ sub create {
   }
 
   msg 'Adding Manifest entry for ' . $stat->dist;
-  my ($success, $errmsg) = run command => [ 'ebuild', $file, 'manifest' ],
-                               verbose => 0;
+  my ($success, $errmsg, $output) = run
+                                     command => [ 'ebuild', $file, 'manifest' ],
+                                     verbose => 0;
   unless ($success) {
    error "$errmsg -- aborting";
+   if (defined $output and $conf->get_conf('verbose')) {
+    my $msg = join '', @$output;
+    1 while chomp $msg;
+    error $msg;
+   }
    1 while unlink $file;
    return 0;
   }
