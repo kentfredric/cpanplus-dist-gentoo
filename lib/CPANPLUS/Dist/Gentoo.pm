@@ -237,8 +237,10 @@ sub create {
   }
 
   msg 'Adding Manifest entry for ' . $stat->dist;
-  unless (scalar run command => [ 'ebuild', $file, 'manifest' ], verbose => 0) {
-   error 'ebuild manifest failed -- aborting';
+  my ($success, $errmsg) = run command => [ 'ebuild', $file, 'manifest' ],
+                               verbose => 0;
+  unless ($success) {
+   error "$errmsg -- aborting";
    1 while unlink $file;
    return 0;
   }
@@ -256,8 +258,10 @@ sub install {
  my @cmd = ('emerge', '=' . $stat->eb_name . '-' . $stat->eb_version);
  unshift @cmd, $sudo if $sudo;
 
- unless (run command => \@cmd, verbose => 1) {
-  error 'emerge failed -- aborting';
+ my ($success, $errmsg) = run command => \@cmd,
+                              verbose => 1;
+ unless ($success) {
+  error "$errmsg -- aborting";
   return 0;
  }
 
@@ -273,8 +277,10 @@ sub uninstall {
  my @cmd = ('emerge', '-C', '=' . $stat->eb_name . '-' . $stat->eb_version);
  unshift @cmd, $sudo if $sudo;
 
- unless (run command => \@cmd, verbose => 1) {
-  error 'emerge -C failed -- aborting';
+ my ($success, $errmsg) = run command => \@cmd,
+                              verbose => 1;
+ unless ($success) {
+  error "$errmsg -- aborting";
   return 0;
  }
 
