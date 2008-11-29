@@ -131,13 +131,28 @@ sub prepare {
 
  $stat->eb_name($gentooism{$stat->name} || $stat->name);
  $stat->eb_dir(catdir($overlay, $stat->eb_name));
- $stat->eb_file(catfile($stat->eb_dir,
-                        $stat->eb_name . '-' . $stat->eb_version . '.ebuild'));
- if (-r $stat->eb_file) {
-  msg 'Ebuild already generated for ' . $stat->dist . ' -- skipping';
-  $stat->prepared(1);
-  $stat->created(1);
-  return 1;
+
+ my $file = catfile($stat->eb_dir,
+                    $stat->eb_name . '-' . $stat->eb_version . '.ebuild');
+ $stat->eb_file($file);
+
+ if (-e $file) {
+  my $skip = 1;
+  if ($stat->force) {
+   if (-w $file) {
+    1 while unlink $file;
+    $skip = 0;
+   } else {
+    error "Can't force rewriting of $file -- skipping";
+   }
+  } else {
+   msg 'Ebuild already generated for ' . $stat->dist . ' -- skipping';
+  }
+  if ($skip) {
+   $stat->prepared(1);
+   $stat->created(1);
+   return 1;
+  }
  }
 
  $self->SUPER::prepare(%opts);
