@@ -3,6 +3,7 @@ package CPANPLUS::Dist::Gentoo;
 use strict;
 use warnings;
 
+use Cwd qw/abs_path/;
 use File::Copy qw/copy/;
 use File::Path qw/mkpath/;
 use File::Spec::Functions qw/catdir catfile/;
@@ -126,9 +127,13 @@ sub prepare {
  }
  $stat->footer($footer);
 
- $stat->overlay(delete($opts{'overlay'}) || '/usr/local/portage');
+ my $overlay = delete $opts{'overlay'};
+ $overlay = (defined $overlay) ? abs_path $overlay : '/usr/local/portage';
+ $stat->overlay($overlay);
 
- $stat->distdir(delete($opts{'distdir'}) || '/usr/portage/distfiles');
+ my $distdir = delete $opts{'distdir'};
+ $distdir = (defined $distdir) ? abs_path $distdir : '/usr/portage/distfiles';
+ $stat->distdir($distdir);
 
  if ($stat->do_manifest && !-w $stat->distdir) {
   error 'distdir isn\'t writable -- aborting';
@@ -358,7 +363,7 @@ Gentoo (L<http://gentoo.org>).
 
 L<CPANPLUS>, L<IPC::Cmd> (core modules since 5.9.5).
 
-L<File::Path> (since 5.001), L<File::Copy> (5.002), L<File::Spec::Functions> (5.00504).
+L<Cwd> (since perl 5) L<File::Path> (5.001), L<File::Copy> (5.002), L<File::Spec::Functions> (5.00504).
 
 =head1 SEE ALSO
 

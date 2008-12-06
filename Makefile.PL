@@ -28,6 +28,7 @@ WriteMakefile(
     PL_FILES      => {},
     PREREQ_PM     => {
         'CPANPLUS'              => 0,
+        'Cwd'                   => 0,
         'File::Copy'            => 0,
         'File::Path'            => 0,
         'File::Spec::Functions' => 0,
