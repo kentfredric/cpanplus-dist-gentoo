@@ -386,6 +386,8 @@ You can find documentation for this module with the perldoc command.
 
 The module is to some extend cargo-culted from L<CPANPLUS::Dist::Deb> and L<CPANPLUS::Dist::Mdv>.
 
+Kent Fredric, for testing and suggesting improvements.
+
 =head1 COPYRIGHT & LICENSE
 
 Copyright 2008 Vincent Pit, all rights reserved.
