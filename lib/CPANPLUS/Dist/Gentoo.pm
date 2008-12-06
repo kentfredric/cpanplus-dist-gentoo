@@ -173,11 +173,12 @@ sub prepare {
 
  $stat->uri('http://search.cpan.org/dist/' . $name);
 
- unless ($name =~ /^([^-]+)/) {
-  error 'Wrong distribution name -- aborting';
+ unless ($author =~ /^(.)(.)/) {
+  error 'Wrong author name -- aborting';
   return 0;
  }
- $stat->src('mirror://cpan/modules/by-module/' . $1 . '/' . $mod->package);
+ $stat->src("mirror://cpan/modules/by-authors/id/$1/$1$2/$author/"
+            . $mod->package);
 
  $stat->license([ qw/Artistic GPL-2/ ]);
 
