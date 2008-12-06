@@ -253,6 +253,7 @@ sub create {
            . ' )';
   } @{$stat->deps};
  $d   .= "\"\n";
+ $d   .= "SRC_TEST=\"do\"\n";
 
  my $file = $stat->eb_file;
  open my $eb, '>', $file or do {
