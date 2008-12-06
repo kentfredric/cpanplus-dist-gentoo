@@ -1,0 +1,13 @@
+#!/bin/sh
+
+HEADER="# Copyright 1999-2008 Gentoo Foundation
+# Distributed under the terms of the GNU General Public License v2"
+
+# For debugging only :
+# PERL5LIB=blib/lib \
+exec cpan2dist --format=CPANPLUS::Dist::Gentoo \
+               --dist-opts manifest=yes        \
+               --dist-opts keywords=amd64      \
+               --dist-opts header="$HEADER"    \
+               --skiptest --verbose            \
+               $@
