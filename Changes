@@ -1,5 +1,16 @@
 Revision history for CPANPLUS-Dist-Gentoo
 
+0.04    2008-12-06 17:05 UTC
+        This release was motivated by Kent Fredric's suggestions in RT #41483.
+        Many thanks to him.
+        + Add : The --dist-opts 'header' and 'footer', that respectively prepend
+                and append any text to the ebuilds.
+        + Add : The samples/g-cpanp shell script (don't forget to set the proper
+                keywords).
+        + Add : Add 'SRC_TEST="do"' in the ebuids so that tests are run when
+                'test' is set in FEATURES.
+        + Fix : Only the modules in the modules list were fetchable.
+
 0.03    2008-11-29 18:45 UTC
         + Add : --force regenerates ebuilds.
         + Fix : Flaky perl -> portage version conversion.

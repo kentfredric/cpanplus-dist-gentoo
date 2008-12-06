@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               CPANPLUS-Dist-Gentoo
-version:            0.03
+version:            0.04
 abstract:           CPANPLUS backend generating Gentoo ebuilds.
 author:
     - Vincent Pit <perl@profvince.com>

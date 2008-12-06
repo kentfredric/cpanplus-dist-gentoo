@@ -2,7 +2,7 @@ NAME
     CPANPLUS::Dist::Gentoo - CPANPLUS backend generating Gentoo ebuilds.
 
 VERSION
-    Version 0.03
+    Version 0.04
 
 SYNOPSIS
         cpan2dist --format=CPANPLUS::Dist::Gentoo \
@@ -10,6 +10,8 @@ SYNOPSIS
                   --dist-opts distdir=/usr/portage/distfiles \
                   --dist-opts manifest=yes \
                   --dist-opts keywords=x86 \
+                  --dist-opts header="# Copyright 1999-2008 Gentoo Foundation" \
+                  --dist-opts footer="# End" \
                   Any::Module You::Like
 
 DESCRPITON
@@ -66,6 +68,8 @@ SUPPORT
 ACKNOWLEDGEMENTS
     The module is to some extend cargo-culted from CPANPLUS::Dist::Deb and
     CPANPLUS::Dist::Mdv.
+
+    Kent Fredric, for testing and suggesting improvements.
 
 COPYRIGHT & LICENSE
     Copyright 2008 Vincent Pit, all rights reserved.
