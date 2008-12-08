@@ -82,13 +82,16 @@ sub init {
 }
 
 my %gentooism = (
+ 'Crypt-RSA'         => 'crypt-rsa',
  'Digest'            => 'digest-base',
  'Locale-Maketext'   => 'locale-maketext',
+ 'Math-Pari'         => 'math-pari',
  'Net-Ping'          => 'net-ping',
  'PathTools'         => 'File-Spec',
  'PodParser'         => 'Pod-Parser',
  'Set-Scalar'        => 'set-scalar',
  'Tie-EncryptedHash' => 'tie-encryptedhash',
+ 'YAML'              => 'yaml',
 );
 
 sub prepare {
