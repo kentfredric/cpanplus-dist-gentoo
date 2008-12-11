@@ -210,7 +210,6 @@ sub prepare {
  $stat->license([ qw/Artistic GPL-2/ ]);
 
  my $prereqs = $mod->status->prereqs;
- $prereqs = { map { ($gentooism{$_} || $_) => $prereqs->{$_} } keys %$prereqs };
  my @depends;
  for my $prereq (sort keys %$prereqs) {
   next if $prereq =~ /^perl(?:-|\z)/;
@@ -276,6 +275,7 @@ sub create {
   'dev-lang/perl',
   map {
    my $a = $_->[0]->package_name;
+   $a = $gentooism{$a} || $a;
    my $x = '';
    if (defined $_->[1]) {
     $x  = '>=';
