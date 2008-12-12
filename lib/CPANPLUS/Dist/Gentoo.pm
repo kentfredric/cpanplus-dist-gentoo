@@ -197,6 +197,8 @@ sub prepare {
 
  $self->SUPER::prepare(%opts);
 
+ $stat->prepared(0);
+
  my $desc = $mod->description;
  ($desc = $name) =~ s/-+/::/g unless $desc;
  $stat->desc($desc);
@@ -261,6 +263,9 @@ sub create {
  $stat->dist(undef);
 
  $self->SUPER::create(@_);
+
+ $stat->created(0);
+ $stat->dist(undef);
 
  my $dir = $stat->eb_dir;
  unless (-d $dir) {
