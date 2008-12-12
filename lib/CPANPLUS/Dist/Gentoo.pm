@@ -189,6 +189,7 @@ sub prepare {
   if ($skip) {
    $stat->prepared(1);
    $stat->created(1);
+   $stat->dist($file);
    return 1;
   }
  }
@@ -246,15 +247,18 @@ sub create {
  unless ($stat->prepared) {
   error 'Can\'t create ' . $stat->distribution . ' since it was never prepared -- aborting';
   $stat->created(0);
+  $stat->dist(undef);
   return 0;
  }
 
  if ($stat->created) {
   msg $stat->distribution . ' was already created -- skipping';
+  $stat->dist($stat->eb_file);
   return 1;
  }
 
  $stat->created(0);
+ $stat->dist(undef);
 
  $self->SUPER::create(@_);
 
@@ -318,6 +322,7 @@ sub create {
  }
 
  $stat->created(1);
+ $stat->dist($file);
  return 1;
 }
 
