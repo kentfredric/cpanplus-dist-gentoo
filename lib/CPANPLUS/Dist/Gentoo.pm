@@ -330,7 +330,10 @@ sub install {
  my @cmd = ('emerge', '=' . $stat->eb_name . '-' . $stat->eb_version);
  unshift @cmd, $sudo if $sudo;
 
- return $self->_run(\@cmd, 1);
+ my $success = $self->_run(\@cmd, 1);
+ $stat->installed($success);
+
+ return $success;
 }
 
 sub uninstall {
