@@ -345,7 +345,10 @@ sub uninstall {
  my @cmd = ('emerge', '-C', '=' . $stat->eb_name . '-' . $stat->eb_version);
  unshift @cmd, $sudo if $sudo;
 
- return $self->_run(\@cmd, 1);
+ my $success = $self->_run(\@cmd, 1);
+ $stat->uninstalled($success);
+
+ return $success;
 }
 
 sub _run {
