@@ -103,6 +103,8 @@ sub prepare {
 
  my %opts = @_;
 
+ $stat->prepared(0);
+
  my $keywords = delete $opts{'keywords'};
  $keywords = 'x86' unless defined $keywords;
  $keywords = [ split ' ', $keywords ];
@@ -233,6 +235,7 @@ sub prepare {
  }
  $stat->deps(\@depends);
 
+ $stat->prepared(1);
  return 1;
 }
 
