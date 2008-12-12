@@ -245,6 +245,7 @@ sub create {
 
  unless ($stat->prepared) {
   error 'Can\'t create ' . $stat->dist . ' since it was never prepared -- aborting';
+  $stat->created(0);
   return 0;
  }
 
@@ -252,6 +253,8 @@ sub create {
   msg $stat->dist . ' was already created -- skipping';
   return 1;
  }
+
+ $stat->created(0);
 
  $self->SUPER::create(@_);
 
@@ -314,6 +317,7 @@ sub create {
   }
  }
 
+ $stat->created(1);
  return 1;
 }
 
