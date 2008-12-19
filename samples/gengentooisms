@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+
+# This scrit is meant to guess gentooisms by looking into the portage tree.
+# A really good one would use the CPANPLUS API to check if the dist name
+# candidates are really on CPAN.
+
+use strict;
+use warnings;
+
+use Fatal;
+use List::Util qw/max/;
+
+use constant PORTAGE => '/usr/portage';
+
+my %gentooism;
+
+for my $category (qw/perl-core dev-perl/) {
+ my $dir = PORTAGE . '/' . $category;
+ chdir $dir;
+ for my $name (<*>) {
+  next unless -d $name;
+  my $eb = (sort glob "$dir/$name/$name-*")[-1];
+  open my $fh, '<', $eb;
+  my ($pn, $on_cpan);
+  while (<$fh>) {
+   $on_cpan = 1 if  not defined $on_cpan
+                and /(?:MODULE_AUTHOR|SRC_URI=.*?(?i:cpan))/;
+   if (not defined $pn and /_PN?=(.*)/) {
+    $pn = $1;
+    if ($pn =~ /^\s*["']?\s*\$\{PN?\}/) {
+     undef $pn;
+     next;
+    }
+    $pn =~ s!\$[{(][^/]*?[})]!!g;
+    $pn =~ s!\$\{P?V.*?\}!!g;
+    $pn =~ s/^\s*["']?\s*-*\s*//;
+    $pn =~ s/\s*-*\s*["']?\s*$//;
+    $pn =~ s/-\d+\..*//;
+    if ($pn =~ m!\$\{PN?(/.*?/(?:.*/?)?)\}!) {
+     my $s = $1;
+     $s .= '/' if $s =~ tr!/!! <= 2;
+     eval "(\$pn = \$name) =~ s$s";
+    }
+   }
+  }
+  if ($pn and $pn ne $name) {
+   if ($on_cpan) {
+    $gentooism{$pn} = $name;
+   } else {
+    print STDERR "'$pn' => '$name' may not be on CPAN\n";
+   }
+  }
+ }
+}
+
+my $max = max map length, keys %gentooism;
+
+print STDERR +(keys %gentooism) . " gentooisms found\n";
+
+print  "my %gentooism = (\n";
+printf " '%s'%s => '%s',\n", $_, (' ' x ($max - length)), $gentooism{$_}
+                                                       for sort keys %gentooism;
+print  ");\n";

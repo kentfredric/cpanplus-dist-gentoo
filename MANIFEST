@@ -4,6 +4,7 @@ Makefile.PL
 README
 lib/CPANPLUS/Dist/Gentoo.pm
 samples/g-cpanp
+samples/gengentooisms
 t/00-load.t
 t/90-boilerplate.t
 t/91-pod.t
