@@ -55,6 +55,8 @@ All the methods are inherited from L<CPANPLUS::Dist::Base>. Please refer to its 
 
 use constant CATEGORY => 'perl-gcpanp';
 
+my $overlays;
+
 sub format_available {
  for my $prog (qw/emerge ebuild/) {
   unless (can_run($prog)) {
@@ -62,6 +64,22 @@ sub format_available {
    return 0;
   }
  }
+
+ if (IPC::Cmd->can_capture_buffer) {
+  my $output = '';
+  my $success = run command => [ qw/emerge --info/ ],
+                    verbose => 0,
+                    buffer  => \$output;
+  if ($success and $output) {
+   if ($output =~ /^PORTDIR_OVERLAY=(.*)$/m) {
+    my $o = $1;
+    $o =~ s/^["']*//;
+    $o =~ s/["']*$//;
+    $overlays = [ map abs_path($_), grep length, split /:/, $o ];
+   }
+  }
+ }
+
  return 1;
 }
 
@@ -72,6 +90,7 @@ sub init {
 
  $stat->mk_accessors(qw/name version author distribution desc uri src license
                         deps eb_name eb_version eb_dir eb_file fetched_arch
+                        portdir_overlay
                         overlay distdir keywords do_manifest header footer
                         force verbose/);
 
@@ -206,6 +225,18 @@ sub prepare {
   return 0;
  }
  $stat->fetched_arch($mod->status->fetch);
+
+ my $cur = File::Spec::Functions::curdir();
+ my $portdir_overlay;
+ for (@$overlays) {
+  if ($_ eq $overlay or File::Spec::Functions::abs2rel($overlay, $_) eq $cur) {
+   $portdir_overlay = join ':', @$overlays;
+   last;
+  }
+ }
+ $portdir_overlay = join ':', @$overlays, $overlay
+                                                unless defined $portdir_overlay;
+ $stat->portdir_overlay($portdir_overlay);
 
  my $name = $mod->package_name;
  $stat->name($name);
@@ -427,7 +458,7 @@ sub _run {
  my $stat = $self->status;
 
  my ($success, $errmsg, $output) = do {
-  local $ENV{PORTDIR_OVERLAY}     = $stat->overlay;
+  local $ENV{PORTDIR_OVERLAY}     = $stat->portdir_overlay;
   local $ENV{PORTAGE_RO_DISTDIRS} = $stat->distdir;
   run command => $cmd, verbose => $verbose;
  };
