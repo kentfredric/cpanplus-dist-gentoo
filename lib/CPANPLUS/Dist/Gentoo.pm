@@ -266,6 +266,8 @@ sub prepare {
 
  my $file = catfile($stat->eb_dir,
                     $stat->eb_name . '-' . $stat->eb_version . '.ebuild');
+ $stat->eb_file($file);
+
  if (-e $file) {
   my $skip = 1;
   if ($stat->force) {
@@ -285,7 +287,6 @@ sub prepare {
    return 1;
   }
  }
- $stat->eb_file($file);
 
  $self->SUPER::prepare(%opts);
 
