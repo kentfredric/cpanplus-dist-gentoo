@@ -66,17 +66,19 @@ sub format_available {
  }
 
  if (IPC::Cmd->can_capture_buffer) {
-  my $output = '';
-  my $success = run command => [ qw/emerge --info/ ],
-                    verbose => 0,
-                    buffer  => \$output;
-  if ($success and $output) {
-   if ($output =~ /^PORTDIR_OVERLAY=(.*)$/m) {
-    my $o = $1;
-    $o =~ s/^["']*//;
-    $o =~ s/["']*$//;
-    $overlays = [ map abs_path($_), grep length, split /:/, $o ];
+  my ($success, $errmsg, $output) = run command => [ qw/emerge --info/ ],
+                                        verbose => 0;
+  if ($success) {
+   for (@{$output || []}) {
+    if (/^PORTDIR_OVERLAY=(.*)$/m) {
+     my $o = $1;
+     $o =~ s/^["']*//;
+     $o =~ s/["']*$//;
+     $overlays = [ map abs_path($_), grep length, split /:/, $o ];
+    }
    }
+  } else {
+   error $errmsg;
   }
  }
 
