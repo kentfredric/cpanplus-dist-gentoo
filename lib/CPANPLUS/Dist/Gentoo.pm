@@ -75,7 +75,7 @@ sub format_available {
      my $o = $1;
      $o =~ s/^["']*//;
      $o =~ s/["']*$//;
-     $overlays = [ map abs_path($_), grep length, split /:/, $o ];
+     $overlays = [ map abs_path($_), split ' ', $o ];
     }
     if (/^ACCEPT_KEYWORDS=(.*)$/m) {
      my $k = $1;
@@ -244,11 +244,11 @@ sub prepare {
  my $portdir_overlay;
  for (@$overlays) {
   if ($_ eq $overlay or File::Spec::Functions::abs2rel($overlay, $_) eq $cur) {
-   $portdir_overlay = join ':', @$overlays;
+   $portdir_overlay = join ' ', @$overlays;
    last;
   }
  }
- $portdir_overlay = join ':', @$overlays, $overlay
+ $portdir_overlay = join ' ', @$overlays, $overlay
                                                 unless defined $portdir_overlay;
  $stat->portdir_overlay($portdir_overlay);
 
