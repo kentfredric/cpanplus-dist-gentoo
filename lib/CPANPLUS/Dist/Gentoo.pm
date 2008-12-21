@@ -57,6 +57,14 @@ use constant CATEGORY => 'perl-gcpanp';
 
 my $overlays;
 my $default_keywords;
+my $default_distdir;
+
+sub _unquote {
+ my $s = shift;
+ $s =~ s/^["']*//;
+ $s =~ s/["']*$//;
+ return $s;
+}
 
 sub format_available {
  for my $prog (qw/emerge ebuild/) {
@@ -72,16 +80,13 @@ sub format_available {
   if ($success) {
    for (@{$output || []}) {
     if (/^PORTDIR_OVERLAY=(.*)$/m) {
-     my $o = $1;
-     $o =~ s/^["']*//;
-     $o =~ s/["']*$//;
-     $overlays = [ map abs_path($_), split ' ', $o ];
+     $overlays = [ map abs_path($_), split ' ', _unquote($1) ];
     }
     if (/^ACCEPT_KEYWORDS=(.*)$/m) {
-     my $k = $1;
-     $k =~ s/^["']*//;
-     $k =~ s/["']*$//;
-     $default_keywords = [ split ' ', $k ];
+     $default_keywords = [ split ' ', _unquote($1) ];
+    }
+    if (/^DISTDIR=(.*)$/m) {
+     $default_distdir = abs_path(_unquote($1));
     }
    }
   } else {
@@ -90,6 +95,7 @@ sub format_available {
  }
 
  $default_keywords = [ 'x86' ] unless defined $default_keywords;
+ $default_distdir  = '/usr/portage/distfiles' unless defined $default_distdir;
 
  return 1;
 }
@@ -231,7 +237,7 @@ sub prepare {
  $stat->overlay($overlay);
 
  my $distdir = delete $opts{'distdir'};
- $distdir = (defined $distdir) ? abs_path $distdir : '/usr/portage/distfiles';
+ $distdir = (defined $distdir) ? abs_path $distdir : $default_distdir;
  $stat->distdir($distdir);
 
  if ($stat->do_manifest && !-w $stat->distdir) {
