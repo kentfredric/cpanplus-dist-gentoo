@@ -117,7 +117,7 @@ sub init {
  return 1;
 }
 
-my %gentooism = (
+our %gentooism = (
  'ANSIColor'               => 'Term-ANSIColor',
  'Audio-CD'                => 'Audio-CD-disc-cover',
  'CGI-Simple'              => 'Cgi-Simple',
