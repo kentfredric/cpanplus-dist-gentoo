@@ -250,12 +250,11 @@ sub prepare {
  my $portdir_overlay;
  for (@$overlays) {
   if ($_ eq $overlay or File::Spec::Functions::abs2rel($overlay, $_) eq $cur) {
-   $portdir_overlay = join ' ', @$overlays;
+   $portdir_overlay = [ @$overlays ];
    last;
   }
  }
- $portdir_overlay = join ' ', @$overlays, $overlay
-                                                unless defined $portdir_overlay;
+ $portdir_overlay = [ @$overlays, $overlay ] unless $portdir_overlay;
  $stat->portdir_overlay($portdir_overlay);
 
  my $name = $mod->package_name;
@@ -470,7 +469,7 @@ sub _run {
  my $stat = $self->status;
 
  my ($success, $errmsg, $output) = do {
-  local $ENV{PORTDIR_OVERLAY}     = $stat->portdir_overlay;
+  local $ENV{PORTDIR_OVERLAY}     = join ' ', @{$stat->portdir_overlay};
   local $ENV{PORTAGE_RO_DISTDIRS} = $stat->distdir;
   run command => $cmd, verbose => $verbose;
  };
