@@ -9,6 +9,7 @@ use File::Path qw/mkpath/;
 use File::Spec::Functions qw/catdir catfile/;
 
 use IPC::Cmd qw/run can_run/;
+use version;
 
 use CPANPLUS::Error;
 
@@ -41,7 +42,7 @@ our $VERSION = '0.04';
 
 This module is a CPANPLUS backend that recursively generates Gentoo ebuilds for a given package in the specified overlay (defaults to F</usr/local/portage>), updates the manifest, and even emerges it (together with its dependencies) if the user requires it. You need write permissions on the directory where Gentoo fetches its source files (usually F</usr/portage/distfiles>). The valid C<KEYWORDS> for the generated ebuilds are by default those given in C<ACCEPT_KEYWORDS>, but you can specify your own with the C<keywords> dist-option.
 
-The generated ebuilds are placed into the C<perl-gcpanp> category. They favour depending on C<perl-core>, C<dev-perl> or C<perl-gcpan> (in that order) rather than C<perl-gcpanp>.
+The generated ebuilds are placed into the C<perl-gcpanp> category. They favour depending on a C<virtual>, on C<perl-core>, C<dev-perl> or C<perl-gcpan> (in that order) rather than C<perl-gcpanp>.
 
 =head1 INSTALLATION
 
@@ -58,6 +59,7 @@ use constant CATEGORY => 'perl-gcpanp';
 my $overlays;
 my $default_keywords;
 my $default_distdir;
+my $main_portdir;
 
 sub _unquote {
  my $s = shift;
@@ -87,6 +89,9 @@ sub format_available {
     }
     if (/^DISTDIR=(.*)$/m) {
      $default_distdir = abs_path(_unquote($1));
+    }
+    if (/^PORTDIR=(.*)$/m) {
+     $main_portdir = abs_path(_unquote($1));
     }
    }
   } else {
@@ -338,7 +343,7 @@ sub prepare {
      $version = $obj->package_version;
     }
    }
-   push @depends, [ $obj , $version ];
+   push @depends, [ $obj->package_name, $version ];
   }
  }
  $stat->deps(\@depends);
@@ -389,21 +394,10 @@ sub create {
  $d   .= "SLOT=\"0\"\n";
  $d   .= 'LICENSE="|| ( ' . join(' ', sort @{$stat->license}) . " )\"\n";
  $d   .= 'KEYWORDS="' . join(' ', sort @{$stat->keywords}) . "\"\n";
- $d   .= 'DEPEND="' . join "\n",
+ $d   .= 'DEPEND="' . join("\n",
   'dev-lang/perl',
-  map {
-   my $a = $_->[0]->package_name;
-   $a = $gentooism{$a} || $a;
-   my $x = '';
-   if (defined $_->[1]) {
-    $x  = '>=';
-    $a .= '-' . $_->[1];
-   }
-   '|| ( ' . join(' ', map "$x$_/$a",
-                           qw/perl-core dev-perl perl-gcpan/, CATEGORY)
-           . ' )';
-  } @{$stat->deps};
- $d   .= "\"\n";
+  map $self->_cpan2portage(@$_), @{$stat->deps}
+ ) . "\"\n";
  $d   .= "SRC_TEST=\"do\"\n";
  $d   .= $stat->footer;
 
@@ -432,6 +426,41 @@ sub create {
  $stat->created(1);
  $stat->dist($file);
  return 1;
+}
+
+sub _cpan2portage {
+ my ($self, $name, $version) = @_;
+
+ $name = $gentooism{$name} || $name;
+ my $ver;
+ $ver = eval { version->new($version) } if defined $version;
+
+ my @portdirs = ($main_portdir, @{$self->status->portdir_overlay});
+
+ for my $category (qw/virtual perl-core dev-perl perl-gcpan/, CATEGORY) {
+  my $atom = ($category eq 'virtual' ? 'perl-' : '') . $name;
+
+  for my $portdir (@portdirs) {
+   my @ebuilds = glob catfile($portdir, $category, $atom,"$atom-*.ebuild");
+   next unless @ebuilds;
+
+   if (defined $version) {
+    for (@ebuilds) {
+     next unless /\Q$atom\E-v?([\d._]+).*?\.ebuild$/;
+     my $eb_ver = eval { version->new($1) };
+     next unless defined $eb_ver and $eb_ver >= $ver;
+     return ">=$category/$atom-$version";
+    }
+   } else {
+    return "$category/$atom";
+   }
+
+  }
+
+ }
+
+ error "Couldn't find an appropriate ebuild for $name in the portage tree -- skipping";
+ return '';
 }
 
 sub install {
@@ -490,7 +519,7 @@ sub _run {
 
 Gentoo (L<http://gentoo.org>).
 
-L<CPANPLUS>, L<IPC::Cmd> (core modules since 5.9.5).
+L<CPANPLUS>, L<IPC::Cmd> (core modules since 5.9.5), L<version> (since 5.009).
 
 L<Cwd> (since perl 5) L<File::Path> (5.001), L<File::Copy> (5.002), L<File::Spec::Functions> (5.00504).
 

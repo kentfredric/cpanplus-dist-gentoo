@@ -5,8 +5,8 @@ HEADER="# Copyright 1999-2008 Gentoo Foundation
 
 # For debugging only :
 # PERL5LIB=blib/lib \
-exec cpan2dist --format=CPANPLUS::Dist::Gentoo \
-               --dist-opts manifest=yes        \
-               --dist-opts header="$HEADER"    \
-               --skiptest --verbose            \
+exec cpan2dist --format=CPANPLUS::Dist::Gentoo    \
+               --dist-opts manifest=yes           \
+               --dist-opts header="$HEADER"       \
+               --skiptest --verbose --buildprereq \
                $@
