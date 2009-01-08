@@ -55,6 +55,7 @@ All the methods are inherited from L<CPANPLUS::Dist::Base>. Please refer to its 
 =cut
 
 use constant CATEGORY => 'perl-gcpanp';
+use constant MAPPER   => 'CPANPLUS::Dist::Gentoo::PackageName::Default';
 
 my $overlays;
 my $default_keywords;
