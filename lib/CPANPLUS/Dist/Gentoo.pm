@@ -444,7 +444,7 @@ sub _cpan2portage {
    my @ebuilds = glob catfile($portdir, $category, $atom,"$atom-*.ebuild");
    next unless @ebuilds;
 
-   if (defined $version) {
+   if (defined $ver) { # implies that $version is defined
     for (@ebuilds) {
      next unless /\Q$atom\E-v?([\d._]+).*?\.ebuild$/;
      my $eb_ver = eval { version->new($1) };
