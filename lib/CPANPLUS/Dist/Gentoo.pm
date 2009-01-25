@@ -61,6 +61,8 @@ my $default_keywords;
 my $default_distdir;
 my $main_portdir;
 
+my %forced;
+
 sub _unquote {
  my $s = shift;
  $s =~ s/^["']*//;
@@ -294,9 +296,10 @@ sub prepare {
 
  if (-e $file) {
   my $skip = 1;
-  if ($stat->force) {
+  if ($stat->force and not $forced{$file}) {
    if (-w $file) {
     1 while unlink $file;
+    $forced{$file} = 1;
     $skip = 0;
    } else {
     error "Can't force rewriting of $file -- skipping";
