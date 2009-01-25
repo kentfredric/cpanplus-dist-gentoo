@@ -70,11 +70,15 @@ sub _unquote {
  return $s;
 }
 
+my $format_available;
+
 sub format_available {
+ return $format_available if defined $format_available;
+
  for my $prog (qw/emerge ebuild/) {
   unless (can_run($prog)) {
    error "$prog is required to write ebuilds -- aborting";
-   return 0;
+   return $format_available = 0;
   }
  }
 
@@ -104,7 +108,7 @@ sub format_available {
  $default_keywords = [ 'x86' ] unless defined $default_keywords;
  $default_distdir  = '/usr/portage/distfiles' unless defined $default_distdir;
 
- return 1;
+ return $format_available = 1;
 }
 
 sub init {
