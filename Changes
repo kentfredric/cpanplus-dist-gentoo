@@ -1,5 +1,19 @@
 Revision history for CPANPLUS-Dist-Gentoo
 
+0.05    2009-01-25 00:30 UTC
+        + Add : Many more gentooisms, and a script to generate them.
+        + Add : Get the default values of options from emerge --info's output: 
+                - the overlay from PORTDIR_OVERLAY ;
+                - the keywords from ACCEPT_KEYWORDS ;
+                - the distdir from DISTDIR ;
+                - the main portage tree from PORTDIR.
+        + Chg : Search in the portage tree for the category (including virtuals)
+                each dependency belongs, and state it explictely in the ebuild's
+                DEPEND. This change was made necessary because portage recently
+                stopped accepting non-existent atoms in || ( ) constructs.
+        + Fix : Append our overlay to the ones specified in PORTDIR_OVERLAY (if
+                it's not listed yet) when running commands.
+
 0.04    2008-12-06 17:05 UTC
         This release was motivated by Kent Fredric's suggestions in RT #41483.
         Many thanks to him.
