@@ -383,14 +383,6 @@ sub create {
   return 1;
  }
 
- $stat->created(0);
- $stat->dist(undef);
-
- $self->SUPER::create(@_);
-
- $stat->created(0);
- $stat->dist(undef);
-
  my $dir = $stat->eb_dir;
  unless (-d $dir) {
   eval { mkpath $dir };
@@ -426,6 +418,14 @@ sub create {
  };
  print $eb $d;
  close $eb;
+
+ $stat->created(0);
+ $stat->dist(undef);
+
+ $self->SUPER::create(@_);
+
+ $stat->created(0);
+ $stat->dist(undef);
 
  if ($stat->do_manifest) {
   unless (copy $stat->fetched_arch, $stat->distdir) {
