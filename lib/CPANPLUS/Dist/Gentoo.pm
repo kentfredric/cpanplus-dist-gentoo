@@ -15,6 +15,8 @@ use CPANPLUS::Error;
 
 use base qw/CPANPLUS::Dist::Base/;
 
+use CPANPLUS::Dist::Gentoo::Maps;
+
 =head1 NAME
 
 CPANPLUS::Dist::Gentoo - CPANPLUS backend generating Gentoo ebuilds.
@@ -128,80 +130,6 @@ sub init {
  return 1;
 }
 
-our %gentooism = (
- 'ANSIColor'               => 'Term-ANSIColor',
- 'Audio-CD'                => 'Audio-CD-disc-cover',
- 'CGI-Simple'              => 'Cgi-Simple',
- 'Cache-Mmap'              => 'cache-mmap',
- 'Class-Loader'            => 'class-loader',
- 'Class-ReturnValue'       => 'class-returnvalue',
- 'Config-General'          => 'config-general',
- 'Convert-ASCII-Armour'    => 'convert-ascii-armour',
- 'Convert-PEM'             => 'convert-pem',
- 'Crypt-CBC'               => 'crypt-cbc',
- 'Crypt-DES_EDE3'          => 'crypt-des-ede3',
- 'Crypt-DH'                => 'crypt-dh',
- 'Crypt-DSA'               => 'crypt-dsa',
- 'Crypt-IDEA'              => 'crypt-idea',
- 'Crypt-Primes'            => 'crypt-primes',
- 'Crypt-RSA'               => 'crypt-rsa',
- 'Crypt-Random'            => 'crypt-random',
- 'DBIx-SearchBuilder'      => 'dbix-searchbuilder',
- 'Data-Buffer'             => 'data-buffer',
- 'Digest'                  => 'digest-base',
- 'Digest-BubbleBabble'     => 'digest-bubblebabble',
- 'Digest-MD2'              => 'digest-md2',
- 'ExtUtils-Depends'        => 'extutils-depends',
- 'ExtUtils-PkgConfig'      => 'extutils-pkgconfig',
- 'Frontier-RPC'            => 'frontier-rpc',
- 'Gimp'                    => 'gimp-perl',
- 'Glib'                    => 'glib-perl',
- 'Gnome2-Canvas'           => 'gnome2-canvas',
- 'Gnome2-GConf'            => 'gnome2-gconf',
- 'Gnome2-Print'            => 'gnome2-print',
- 'Gnome2-VFS'              => 'gnome2-vfs-perl',
- 'Gnome2-Wnck'             => 'gnome2-wnck',
- 'Gtk2'                    => 'gtk2-perl',
- 'Gtk2-Ex-FormFactory'     => 'gtk2-ex-formfactory',
- 'Gtk2-GladeXML'           => 'gtk2-gladexml',
- 'Gtk2-Spell'              => 'gtk2-spell',
- 'Gtk2-TrayIcon'           => 'gtk2-trayicon',
- 'Gtk2-TrayManager'        => 'gtk2-traymanager',
- 'Gtk2Fu'                  => 'gtk2-fu',
- 'I18N-LangTags'           => 'i18n-langtags',
- 'Image-Info'              => 'ImageInfo',
- 'Image-Size'              => 'ImageSize',
- 'Inline-Files'            => 'inline-files',
- 'Locale-Maketext'         => 'locale-maketext',
- 'Locale-Maketext-Fuzzy'   => 'locale-maketext-fuzzy',
- 'Locale-Maketext-Lexicon' => 'locale-maketext-lexicon',
- 'Log-Dispatch'            => 'log-dispatch',
- 'Math-Pari'               => 'math-pari',
- 'Module-Info'             => 'module-info',
- 'Net-Ping'                => 'net-ping',
- 'Net-SFTP'                => 'net-sftp',
- 'Net-SSH-Perl'            => 'net-ssh-perl',
- 'Net-Server'              => 'net-server',
- 'OLE-Storage_Lite'        => 'OLE-StorageLite',
- 'Ogg-Vorbis-Header'       => 'ogg-vorbis-header',
- 'PathTools'               => 'File-Spec',
- 'Pod-Parser'              => 'PodParser',
- 'Regexp-Common'           => 'regexp-common',
- 'SDL_Perl'                => 'sdl-perl',
- 'Set-Scalar'              => 'set-scalar',
- 'String-CRC32'            => 'string-crc32',
- 'Text-Autoformat'         => 'text-autoformat',
- 'Text-Reform'             => 'text-reform',
- 'Text-Template'           => 'text-template',
- 'Text-Wrapper'            => 'text-wrapper',
- 'Tie-EncryptedHash'       => 'tie-encryptedhash',
- 'Tk'                      => 'perl-tk',
- 'Wx'                      => 'wxperl',
- 'YAML'                    => 'yaml',
- 'gettext'                 => 'Locale-gettext',
- 'txt2html'                => 'TextToHTML',
-);
-
 sub prepare {
  my $self = shift;
  my $mod  = $self->parent;
@@ -290,7 +218,7 @@ sub prepare {
  }
  $stat->eb_version($version);
 
- $stat->eb_name($gentooism{$name} || $name);
+ $stat->eb_name(CPANPLUS::Dist::Gentoo::Maps::name_c2g($name));
 
  $stat->eb_dir(catdir($stat->overlay, CATEGORY, $stat->eb_name));
 
@@ -449,7 +377,7 @@ sub create {
 sub _cpan2portage {
  my ($self, $name, $version) = @_;
 
- $name = $gentooism{$name} || $name;
+ $name = CPANPLUS::Dist::Gentoo::Maps::name_c2g($name);
  my $ver;
  $ver = eval { version->new($version) } if defined $version;
 
