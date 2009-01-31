@@ -14,6 +14,17 @@ use constant PORTAGE => '/usr/portage';
 
 my %gentooism;
 
+my %where = (
+ 'Audio-CD-disc-cover' => 1,
+ 'aww'                 => 0,
+ 'frontier-rpc'        => 1,
+ 'gimp-perl'           => 1,
+ 'gnome2-wnck'         => 1,
+ 'HTML-Object'         => 0,
+ 'JKFlow'              => 0,
+ 'PDF-Create'          => 0,
+);
+
 for my $category (qw/perl-core dev-perl/) {
  my $dir = PORTAGE . '/' . $category;
  chdir $dir;
@@ -22,6 +33,7 @@ for my $category (qw/perl-core dev-perl/) {
   my $eb = (sort glob "$dir/$name/$name-*")[-1];
   open my $fh, '<', $eb;
   my ($pn, $on_cpan);
+  $on_cpan = $where{$name} if exists $where{$name};
   while (<$fh>) {
    $on_cpan = 1 if  not defined $on_cpan
                 and /(?:MODULE_AUTHOR|SRC_URI=.*?(?i:cpan))/;
@@ -46,7 +58,7 @@ for my $category (qw/perl-core dev-perl/) {
   if ($pn and $pn ne $name) {
    if ($on_cpan) {
     $gentooism{$pn} = $name;
-   } else {
+   } elsif (not defined $on_cpan) {
     print STDERR "'$pn' => '$name' may not be on CPAN\n";
    }
   }
@@ -57,7 +69,7 @@ my $max = max map length, keys %gentooism;
 
 print STDERR +(keys %gentooism) . " gentooisms found\n";
 
-print  "my %gentooism = (\n";
+print  "our %gentooism = (\n";
 printf " '%s'%s => '%s',\n", $_, (' ' x ($max - length)), $gentooism{$_}
                                                        for sort keys %gentooism;
 print  ");\n";
