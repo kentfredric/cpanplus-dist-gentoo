@@ -365,10 +365,11 @@ sub create {
 }
 
 sub _cpan2portage {
- my ($self, $name, $ver) = @_;
+ my ($self, $name, $version) = @_;
 
  $name = CPANPLUS::Dist::Gentoo::Maps::name_c2g($name);
- $ver  = CPANPLUS::Dist::Gentoo::Maps::version_c2g($ver);
+ my $ver;
+ $ver = CPANPLUS::Dist::Gentoo::Maps::version_c2g($version) if defined $version;
 
  my @portdirs = ($main_portdir, @{$self->status->portdir_overlay});
 
