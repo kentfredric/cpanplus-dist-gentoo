@@ -40,6 +40,67 @@ sub name_c2g {
  return $gentooisms{$name} || $name;
 }
 
+=head2 C<version_c2g $version>
+
+Converts a CPAN version to a Gentoo version.
+
+=cut
+
+sub version_c2g {
+ my ($v) = @_;
+
+ $v =~ y/-/_/;
+ $v =~ y/0-9._//cd;
+
+ $v =~ s/^[._]*//;
+ $v =~ s/[._]*$//;
+ $v =~ s/([._])[._]*/$1/g;
+
+ ($v, my $patch, my @rest) = split /_/, $v;
+ $v .= '_p' . $patch if defined $patch;
+ $v .= join('.', '', @rest) if @rest;
+
+ return $v;
+}
+
+=head2 C<version_gcmp $va, $vb>
+
+Compares two Gentoo versions.
+
+=cut
+
+sub version_gcmp {
+ my ($a, $b) = map { defined() ? $_ : 0 } @_;
+
+ for ($a, $b) {
+  s/^[._]+//g;
+  s/[._]+$//g;
+  if (/^([\d.]*\d)\.*(?:_p\.*(\d[\d.]*))?\.*(?:-r(\d+))?$/) {
+   $_ = {
+    v => [ split /\.+/, $1 ],
+    p => [ split /\.+/, $2 || 0 ],
+    r => [ $3 || 0 ],
+   };
+  } else {
+   require Carp;
+   Carp::croak("Couldn't parse version string '$_'");
+  }
+ }
+
+ for my $k (qw/v p r/) {
+  my $xa = $a->{$k};
+  my $xb = $b->{$k};
+  while (@$xa or @$xb) {
+   my $na = shift(@$xa) || 0;
+   my $nb = shift(@$xb) || 0;
+   my $c  = $na <=> $nb;
+   return $c if $c;
+  }
+ }
+
+ return 0;
+}
+
 =head1 SEE ALSO
 
 L<CPANPLUS::Dist::Gentoo>.

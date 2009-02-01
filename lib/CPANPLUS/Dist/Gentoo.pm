@@ -9,7 +9,6 @@ use File::Path qw/mkpath/;
 use File::Spec::Functions qw/catdir catfile/;
 
 use IPC::Cmd qw/run can_run/;
-use version;
 
 use CPANPLUS::Error;
 
@@ -207,16 +206,7 @@ sub prepare {
 
  $stat->distribution($name . '-' . $version);
 
- $version =~ s/[^\d._]+//g;
- $version =~ s/^[._]*//;
- $version =~ s/[._]*$//;
- $version =~ s/[._]*_[._]*/_/g;
- {
-  ($version, my $patch, my @rest) = split /_/, $version;
-  $version .= '_p' . $patch if defined $patch;
-  $version .= join('.', '', @rest) if @rest;
- }
- $stat->eb_version($version);
+ $stat->eb_version(CPANPLUS::Dist::Gentoo::Maps::version_c2g($version));
 
  $stat->eb_name(CPANPLUS::Dist::Gentoo::Maps::name_c2g($name));
 
@@ -375,11 +365,10 @@ sub create {
 }
 
 sub _cpan2portage {
- my ($self, $name, $version) = @_;
+ my ($self, $name, $ver) = @_;
 
  $name = CPANPLUS::Dist::Gentoo::Maps::name_c2g($name);
- my $ver;
- $ver = eval { version->new($version) } if defined $version;
+ $ver  = CPANPLUS::Dist::Gentoo::Maps::version_c2g($ver);
 
  my @portdirs = ($main_portdir, @{$self->status->portdir_overlay});
 
@@ -392,10 +381,10 @@ sub _cpan2portage {
 
    if (defined $ver) { # implies that $version is defined
     for (@ebuilds) {
-     next unless /\Q$atom\E-v?([\d._]+).*?\.ebuild$/;
-     my $eb_ver = eval { version->new($1) };
-     next unless defined $eb_ver and $eb_ver >= $ver;
-     return ">=$category/$atom-$version";
+     my ($eb_ver) = /\Q$atom\E-v?([\d._pr-]+).*?\.ebuild$/;
+     return ">=$category/$atom-$ver"
+            if  defined $eb_ver
+            and CPANPLUS::Dist::Gentoo::Maps::version_gcmp($eb_ver, $ver) > 0;
     }
    } else {
     return "$category/$atom";
@@ -465,9 +454,9 @@ sub _run {
 
 Gentoo (L<http://gentoo.org>).
 
-L<CPANPLUS>, L<IPC::Cmd> (core modules since 5.9.5), L<version> (since 5.009).
+L<CPANPLUS>, L<IPC::Cmd> (core modules since 5.9.5).
 
-L<Cwd> (since perl 5) L<File::Path> (5.001), L<File::Copy> (5.002), L<File::Spec::Functions> (5.00504).
+L<Cwd>, L<Carp> (since perl 5), L<File::Path> (5.001), L<File::Copy> (5.002), L<File::Spec::Functions> (5.00504).
 
 =head1 SEE ALSO
 
