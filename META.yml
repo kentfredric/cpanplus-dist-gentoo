@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               CPANPLUS-Dist-Gentoo
-version:            0.04
+version:            0.05
 abstract:           CPANPLUS backend generating Gentoo ebuilds.
 author:
     - Vincent Pit <perl@profvince.com>
@@ -10,10 +10,12 @@ configure_requires:
     ExtUtils::MakeMaker:  0
 requires:
     CPANPLUS:             0
+    Cwd:                  0
     File::Copy:           0
     File::Path:           0
     File::Spec::Functions:  0
     IPC::Cmd:             0
+    version:              0
 no_index:
     directory:
         - t

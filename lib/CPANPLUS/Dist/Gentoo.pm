@@ -9,11 +9,12 @@ use File::Path qw/mkpath/;
 use File::Spec::Functions qw/catdir catfile/;
 
 use IPC::Cmd qw/run can_run/;
-use version;
 
 use CPANPLUS::Error;
 
 use base qw/CPANPLUS::Dist::Base/;
+
+use CPANPLUS::Dist::Gentoo::Maps;
 
 =head1 NAME
 
@@ -21,11 +22,11 @@ CPANPLUS::Dist::Gentoo - CPANPLUS backend generating Gentoo ebuilds.
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -62,6 +63,8 @@ my $default_keywords;
 my $default_distdir;
 my $main_portdir;
 
+my %forced;
+
 sub _unquote {
  my $s = shift;
  $s =~ s/^["']*//;
@@ -69,11 +72,15 @@ sub _unquote {
  return $s;
 }
 
+my $format_available;
+
 sub format_available {
+ return $format_available if defined $format_available;
+
  for my $prog (qw/emerge ebuild/) {
   unless (can_run($prog)) {
    error "$prog is required to write ebuilds -- aborting";
-   return 0;
+   return $format_available = 0;
   }
  }
 
@@ -103,7 +110,7 @@ sub format_available {
  $default_keywords = [ 'x86' ] unless defined $default_keywords;
  $default_distdir  = '/usr/portage/distfiles' unless defined $default_distdir;
 
- return 1;
+ return $format_available = 1;
 }
 
 sub init {
@@ -111,7 +118,7 @@ sub init {
  my $stat = $self->status;
  my $conf = $self->parent->parent->configure_object;
 
- $stat->mk_accessors(qw/name version author distribution desc uri license
+ $stat->mk_accessors(qw/name version author distribution desc uri src license
                         deps eb_name eb_version eb_dir eb_file fetched_arch
                         portdir_overlay
                         overlay distdir keywords do_manifest header footer
@@ -122,80 +129,6 @@ sub init {
 
  return 1;
 }
-
-our %gentooism = (
- 'ANSIColor'               => 'Term-ANSIColor',
- 'Audio-CD'                => 'Audio-CD-disc-cover',
- 'CGI-Simple'              => 'Cgi-Simple',
- 'Cache-Mmap'              => 'cache-mmap',
- 'Class-Loader'            => 'class-loader',
- 'Class-ReturnValue'       => 'class-returnvalue',
- 'Config-General'          => 'config-general',
- 'Convert-ASCII-Armour'    => 'convert-ascii-armour',
- 'Convert-PEM'             => 'convert-pem',
- 'Crypt-CBC'               => 'crypt-cbc',
- 'Crypt-DES_EDE3'          => 'crypt-des-ede3',
- 'Crypt-DH'                => 'crypt-dh',
- 'Crypt-DSA'               => 'crypt-dsa',
- 'Crypt-IDEA'              => 'crypt-idea',
- 'Crypt-Primes'            => 'crypt-primes',
- 'Crypt-RSA'               => 'crypt-rsa',
- 'Crypt-Random'            => 'crypt-random',
- 'DBIx-SearchBuilder'      => 'dbix-searchbuilder',
- 'Data-Buffer'             => 'data-buffer',
- 'Digest'                  => 'digest-base',
- 'Digest-BubbleBabble'     => 'digest-bubblebabble',
- 'Digest-MD2'              => 'digest-md2',
- 'ExtUtils-Depends'        => 'extutils-depends',
- 'ExtUtils-PkgConfig'      => 'extutils-pkgconfig',
- 'Frontier-RPC'            => 'frontier-rpc',
- 'Gimp'                    => 'gimp-perl',
- 'Glib'                    => 'glib-perl',
- 'Gnome2-Canvas'           => 'gnome2-canvas',
- 'Gnome2-GConf'            => 'gnome2-gconf',
- 'Gnome2-Print'            => 'gnome2-print',
- 'Gnome2-VFS'              => 'gnome2-vfs-perl',
- 'Gnome2-Wnck'             => 'gnome2-wnck',
- 'Gtk2'                    => 'gtk2-perl',
- 'Gtk2-Ex-FormFactory'     => 'gtk2-ex-formfactory',
- 'Gtk2-GladeXML'           => 'gtk2-gladexml',
- 'Gtk2-Spell'              => 'gtk2-spell',
- 'Gtk2-TrayIcon'           => 'gtk2-trayicon',
- 'Gtk2-TrayManager'        => 'gtk2-traymanager',
- 'Gtk2Fu'                  => 'gtk2-fu',
- 'I18N-LangTags'           => 'i18n-langtags',
- 'Image-Info'              => 'ImageInfo',
- 'Image-Size'              => 'ImageSize',
- 'Inline-Files'            => 'inline-files',
- 'Locale-Maketext'         => 'locale-maketext',
- 'Locale-Maketext-Fuzzy'   => 'locale-maketext-fuzzy',
- 'Locale-Maketext-Lexicon' => 'locale-maketext-lexicon',
- 'Log-Dispatch'            => 'log-dispatch',
- 'Math-Pari'               => 'math-pari',
- 'Module-Info'             => 'module-info',
- 'Net-Ping'                => 'net-ping',
- 'Net-SFTP'                => 'net-sftp',
- 'Net-SSH-Perl'            => 'net-ssh-perl',
- 'Net-Server'              => 'net-server',
- 'OLE-Storage_Lite'        => 'OLE-StorageLite',
- 'Ogg-Vorbis-Header'       => 'ogg-vorbis-header',
- 'PathTools'               => 'File-Spec',
- 'Pod-Parser'              => 'PodParser',
- 'Regexp-Common'           => 'regexp-common',
- 'SDL_Perl'                => 'sdl-perl',
- 'Set-Scalar'              => 'set-scalar',
- 'String-CRC32'            => 'string-crc32',
- 'Text-Autoformat'         => 'text-autoformat',
- 'Text-Reform'             => 'text-reform',
- 'Text-Template'           => 'text-template',
- 'Text-Wrapper'            => 'text-wrapper',
- 'Tie-EncryptedHash'       => 'tie-encryptedhash',
- 'Tk'                      => 'perl-tk',
- 'Wx'                      => 'wxperl',
- 'YAML'                    => 'yaml',
- 'gettext'                 => 'Locale-gettext',
- 'txt2html'                => 'TextToHTML',
-);
 
 sub prepare {
  my $self = shift;
@@ -274,18 +207,9 @@ sub prepare {
 
  $stat->distribution($name . '-' . $version);
 
- $version =~ s/[^\d._]+//g;
- $version =~ s/^[._]*//;
- $version =~ s/[._]*$//;
- $version =~ s/[._]*_[._]*/_/g;
- {
-  ($version, my $patch, my @rest) = split /_/, $version;
-  $version .= '_p' . $patch if defined $patch;
-  $version .= join('.', '', @rest) if @rest;
- }
- $stat->eb_version($version);
+ $stat->eb_version(CPANPLUS::Dist::Gentoo::Maps::version_c2g($version));
 
- $stat->eb_name($gentooism{$name} || $name);
+ $stat->eb_name(CPANPLUS::Dist::Gentoo::Maps::name_c2g($name));
 
  $stat->eb_dir(catdir($stat->overlay, CATEGORY, $stat->eb_name));
 
@@ -295,9 +219,10 @@ sub prepare {
 
  if (-e $file) {
   my $skip = 1;
-  if ($stat->force) {
+  if ($stat->force and not $forced{$file}) {
    if (-w $file) {
     1 while unlink $file;
+    $forced{$file} = 1;
     $skip = 0;
    } else {
     error "Can't force rewriting of $file -- skipping";
@@ -322,6 +247,13 @@ sub prepare {
  $stat->desc($desc);
 
  $stat->uri('http://search.cpan.org/dist/' . $name);
+
+ unless ($author =~ /^(.)(.)/) {
+  error 'Wrong author name -- aborting';
+  return 0;
+ }
+ $stat->src("mirror://cpan/modules/by-authors/id/$1/$1$2/$author/"
+            . $mod->package);
 
  $stat->license([ qw/Artistic GPL-2/ ]);
 
@@ -370,14 +302,6 @@ sub create {
   return 1;
  }
 
- $stat->created(0);
- $stat->dist(undef);
-
- $self->SUPER::create(@_);
-
- $stat->created(0);
- $stat->dist(undef);
-
  my $dir = $stat->eb_dir;
  unless (-d $dir) {
   eval { mkpath $dir };
@@ -387,17 +311,21 @@ sub create {
   }
  }
 
+ my %seen;
+
  my $d = $stat->header;
  $d   .= "# Generated by CPANPLUS::Dist::Gentoo version $VERSION\n\n";
  $d   .= 'MODULE_AUTHOR="' . $stat->author . "\"\ninherit perl-module\n\n";
+ $d   .= 'S="${WORKDIR}/' . $stat->distribution . "\"\n";
  $d   .= 'DESCRIPTION="' . $stat->desc . "\"\n";
- $d   .= 'HOMEPAGE="' . $stat->uri . "\"\n\n";
+ $d   .= 'HOMEPAGE="' . $stat->uri . "\"\n";
+ $d   .= 'SRC_URI="' . $stat->src . "\"\n";
  $d   .= "SLOT=\"0\"\n";
  $d   .= 'LICENSE="|| ( ' . join(' ', sort @{$stat->license}) . " )\"\n";
  $d   .= 'KEYWORDS="' . join(' ', sort @{$stat->keywords}) . "\"\n";
  $d   .= 'DEPEND="' . join("\n",
-  'dev-lang/perl',
-  map $self->_cpan2portage(@$_), @{$stat->deps}
+  sort grep !$seen{$_}++, 'dev-lang/perl',
+                          map $self->_cpan2portage(@$_), @{$stat->deps}
  ) . "\"\n";
  $d   .= "SRC_TEST=\"do\"\n";
  $d   .= $stat->footer;
@@ -409,6 +337,14 @@ sub create {
  };
  print $eb $d;
  close $eb;
+
+ $stat->created(0);
+ $stat->dist(undef);
+
+ $self->SUPER::create(@_);
+
+ $stat->created(0);
+ $stat->dist(undef);
 
  if ($stat->do_manifest) {
   unless (copy $stat->fetched_arch, $stat->distdir) {
@@ -432,9 +368,9 @@ sub create {
 sub _cpan2portage {
  my ($self, $name, $version) = @_;
 
- $name = $gentooism{$name} || $name;
+ $name = CPANPLUS::Dist::Gentoo::Maps::name_c2g($name);
  my $ver;
- $ver = eval { version->new($version) } if defined $version;
+ $ver = CPANPLUS::Dist::Gentoo::Maps::version_c2g($version) if defined $version;
 
  my @portdirs = ($main_portdir, @{$self->status->portdir_overlay});
 
@@ -445,12 +381,12 @@ sub _cpan2portage {
    my @ebuilds = glob catfile($portdir, $category, $atom,"$atom-*.ebuild");
    next unless @ebuilds;
 
-   if (defined $version) {
+   if (defined $ver) { # implies that $version is defined
     for (@ebuilds) {
-     next unless /\Q$atom\E-v?([\d._]+).*?\.ebuild$/;
-     my $eb_ver = eval { version->new($1) };
-     next unless defined $eb_ver and $eb_ver >= $ver;
-     return ">=$category/$atom-$version";
+     my ($eb_ver) = /\Q$atom\E-v?([\d._pr-]+).*?\.ebuild$/;
+     return ">=$category/$atom-$ver"
+            if  defined $eb_ver
+            and CPANPLUS::Dist::Gentoo::Maps::version_gcmp($eb_ver, $ver) > 0;
     }
    } else {
     return "$category/$atom";
@@ -520,9 +456,9 @@ sub _run {
 
 Gentoo (L<http://gentoo.org>).
 
-L<CPANPLUS>, L<IPC::Cmd> (core modules since 5.9.5), L<version> (since 5.009).
+L<CPANPLUS>, L<IPC::Cmd> (core modules since 5.9.5).
 
-L<Cwd> (since perl 5) L<File::Path> (5.001), L<File::Copy> (5.002), L<File::Spec::Functions> (5.00504).
+L<Cwd>, L<Carp> (since perl 5), L<File::Path> (5.001), L<File::Copy> (5.002), L<File::Spec::Functions> (5.00504).
 
 =head1 SEE ALSO
 
@@ -554,7 +490,7 @@ Kent Fredric, for testing and suggesting improvements.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008 Vincent Pit, all rights reserved.
+Copyright 2008-2009 Vincent Pit, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 

@@ -8,11 +8,28 @@ use strict;
 use warnings;
 
 use Fatal;
+use Cwd qw/cwd/;
 use List::Util qw/max/;
+use File::Copy qw/copy/;
 
 use constant PORTAGE => '/usr/portage';
+use constant TARGET  => 'lib/CPANPLUS/Dist/Gentoo/Maps.pm';
+use constant BACKUP  => TARGET . '.bak';
 
 my %gentooism;
+
+my %where = (
+ 'Audio-CD-disc-cover' => 1,
+ 'aww'                 => 0,
+ 'frontier-rpc'        => 1,
+ 'gimp-perl'           => 1,
+ 'gnome2-wnck'         => 1,
+ 'HTML-Object'         => 0,
+ 'JKFlow'              => 0,
+ 'PDF-Create'          => 0,
+);
+
+my $cwd = cwd();
 
 for my $category (qw/perl-core dev-perl/) {
  my $dir = PORTAGE . '/' . $category;
@@ -22,6 +39,7 @@ for my $category (qw/perl-core dev-perl/) {
   my $eb = (sort glob "$dir/$name/$name-*")[-1];
   open my $fh, '<', $eb;
   my ($pn, $on_cpan);
+  $on_cpan = $where{$name} if exists $where{$name};
   while (<$fh>) {
    $on_cpan = 1 if  not defined $on_cpan
                 and /(?:MODULE_AUTHOR|SRC_URI=.*?(?i:cpan))/;
@@ -46,18 +64,30 @@ for my $category (qw/perl-core dev-perl/) {
   if ($pn and $pn ne $name) {
    if ($on_cpan) {
     $gentooism{$pn} = $name;
-   } else {
+   } elsif (not defined $on_cpan) {
     print STDERR "'$pn' => '$name' may not be on CPAN\n";
    }
   }
  }
 }
 
+chdir $cwd;
+
+copy TARGET, BACKUP or die "copy failed: $!";
+
+open my $src, '<', BACKUP;
+open my $dst, '>', TARGET;
+
 my $max = max map length, keys %gentooism;
+
+SRC: while (<$src>) {
+ print $dst $_;
+ if (/^__DATA__$/) {
+  printf $dst "%s%s %s\n", $_, (' ' x ($max - length)), $gentooism{$_}
+                                                       for sort keys %gentooism;
+  last SRC;
+ }
+}
 
 print STDERR +(keys %gentooism) . " gentooisms found\n";
 
-print  "my %gentooism = (\n";
-printf " '%s'%s => '%s',\n", $_, (' ' x ($max - length)), $gentooism{$_}
-                                                       for sort keys %gentooism;
-print  ");\n";

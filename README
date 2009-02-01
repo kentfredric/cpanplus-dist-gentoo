@@ -2,7 +2,7 @@ NAME
     CPANPLUS::Dist::Gentoo - CPANPLUS backend generating Gentoo ebuilds.
 
 VERSION
-    Version 0.04
+    Version 0.05
 
 SYNOPSIS
         cpan2dist --format=CPANPLUS::Dist::Gentoo \
@@ -20,12 +20,13 @@ DESCRPITON
     /usr/local/portage), updates the manifest, and even emerges it (together
     with its dependencies) if the user requires it. You need write
     permissions on the directory where Gentoo fetches its source files
-    (usually /usr/portage/distfiles). You also need to specify the correct
-    keyword for your architecture if it differs from the default "x86".
+    (usually /usr/portage/distfiles). The valid "KEYWORDS" for the generated
+    ebuilds are by default those given in "ACCEPT_KEYWORDS", but you can
+    specify your own with the "keywords" dist-option.
 
     The generated ebuilds are placed into the "perl-gcpanp" category. They
-    favour depending on "perl-core", "dev-perl" or "perl-gcpan" (in that
-    order) rather than "perl-gcpanp".
+    favour depending on a "virtual", on "perl-core", "dev-perl" or
+    "perl-gcpan" (in that order) rather than "perl-gcpanp".
 
 INSTALLATION
     After installing this module, you should append "perl-gcpanp" to your
@@ -38,10 +39,10 @@ METHODS
 DEPENDENCIES
     Gentoo (<http://gentoo.org>).
 
-    CPANPLUS, IPC::Cmd (core modules since 5.9.5).
+    CPANPLUS, IPC::Cmd (core modules since 5.9.5), version (since 5.009).
 
-    File::Path (since 5.001), File::Copy (5.002), File::Spec::Functions
-    (5.00504).
+    Cwd (since perl 5) File::Path (5.001), File::Copy (5.002),
+    File::Spec::Functions (5.00504).
 
 SEE ALSO
     cpan2dist.
@@ -72,7 +73,7 @@ ACKNOWLEDGEMENTS
     Kent Fredric, for testing and suggesting improvements.
 
 COPYRIGHT & LICENSE
-    Copyright 2008 Vincent Pit, all rights reserved.
+    Copyright 2008-2009 Vincent Pit, all rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.
