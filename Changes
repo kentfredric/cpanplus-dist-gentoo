@@ -1,5 +1,16 @@
 Revision history for CPANPLUS-Dist-Gentoo
 
+0.06    2009-02-14 18:15 UTC
+        + Chg : The new CPANPLUS::Dist::Gentoo::Maps holds the gentooisms and
+                provides routines for converting CPAN versions to Gentoo.
+                version.pm is longer required.
+        + Chg : Generate ebuild for the current dist before recursing.
+        + Fix : Prevent infinite loop when forcing a distribution with recursive
+                dependencies.
+        + Fix : Remove duplicated dependencies from DEPEND.
+        + Upd : Resources in META.yml.
+        + Tst : Test gentooisms and version mappings.
+
 0.05    2009-01-25 00:30 UTC
         + Add : Many more gentooisms, and a script to generate them.
         + Add : Get the default values of options from emerge --info's output: 

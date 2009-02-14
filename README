@@ -2,7 +2,7 @@ NAME
     CPANPLUS::Dist::Gentoo - CPANPLUS backend generating Gentoo ebuilds.
 
 VERSION
-    Version 0.05
+    Version 0.06
 
 SYNOPSIS
         cpan2dist --format=CPANPLUS::Dist::Gentoo \
@@ -39,9 +39,9 @@ METHODS
 DEPENDENCIES
     Gentoo (<http://gentoo.org>).
 
-    CPANPLUS, IPC::Cmd (core modules since 5.9.5), version (since 5.009).
+    CPANPLUS, IPC::Cmd (core modules since 5.9.5).
 
-    Cwd (since perl 5) File::Path (5.001), File::Copy (5.002),
+    Cwd, Carp (since perl 5), File::Path (5.001), File::Copy (5.002),
     File::Spec::Functions (5.00504).
 
 SEE ALSO
