@@ -441,7 +441,7 @@ sub _run {
 
  unless ($success) {
   error "$errmsg -- aborting";
-  if (not $verbose and defined $output and $self->status->verbose) {
+  if (not $verbose and defined $output and $stat->verbose) {
    my $msg = join '', @$output;
    1 while chomp $msg;
    error $msg;
